@@ -49,7 +49,7 @@ Input formats -> BIN1-A : IQ samples (9.6K) .dat file.  Fixed time duration
 
 # To run runSanityCheck.m
 First you need to clone project-nsc-rice and checkout develop branch.
-git clone https://gitlab.ad.sklk.us/projectrice/proj-nsc-rice
+
 cd proj-nsc-rice
 git checkout develop
 cd code/skyscan/native
