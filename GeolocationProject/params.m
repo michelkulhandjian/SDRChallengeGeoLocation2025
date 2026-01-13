@@ -15,7 +15,7 @@ nAntsperGrp     = 84; % Number of Antennas per Group
 nFreqsperGrp    = 84;  % Constrain is 4 Freq per Ant
 fs_SEC          = 1;  % sampling rate for SEC
 D               = 16;      % Delay Tap
-fs              = 10e6; %61.44e6; % Rx sampling rate;          % e.g., 40 MHz
+fs              = 100e6; %61.44e6; % Rx sampling rate;          % e.g., 40 MHz
 fc              = 3.65e9; %3.6e9;   % center frequency          % e.g., 2.5 GHz 
 bw              = 5e6;      % Bandwidth (Hz) of the signal    % e.g., 10 MHz
 num_sparse_elem = 1;       % sparseness for SEC
@@ -37,8 +37,8 @@ dataType        = 'int16';  % Set the data read type (e.g., 'int16', 'float32', 
 dataScalingIQ   = 2^(-15);  % This is scaling for IQ data
 dataScalingSEC  = 2^(-11);  % This is for SEC output to adhere 5.11
 		   
-bPos = [0 1.27 ; ...
-        0 0  ]; 
+bPos = [0 1.27 2.6; ...
+        0 0  1.2]*50; 
 	
 
 % bPos = [0 50 75  100 ; ...
@@ -54,7 +54,7 @@ bVel = zeros(size(bPos));
 targetLoc       = 1; % 1- Target Location , 2- Drone, 3- AWACS
 
 if targetLoc   == 1
-pPos      = [0.8382; -1.084]; %[80; 40; 110];  %Dist 10,409 meters    % 9150 m      % position (m);   At 30,000 ft
+pPos      = [0.8382; -1.084]*50; %[80; 40; 110];  %Dist 10,409 meters    % 9150 m      % position (m);   At 30,000 ft
 pVel      = [0; 0;];  % 
 %pPos      = [-20; 20; 10];
 %pVel      = [0; 0; 0];  % 

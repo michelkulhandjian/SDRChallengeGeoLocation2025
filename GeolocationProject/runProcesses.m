@@ -6,7 +6,7 @@ function runProcesses (inputPathDir, outputPathDir , runType, mode )
 rP.debugLog       = true;
 
 if ~exist('runType','var')
-    runType   = "GENDATASET";   % Options: {"GENDATASET", "LOCANALYSIS", "LOCALIZE"}
+    runType   = "LOCALIZE";   % Options: {"GENDATASET", "CROSSCORRELATE",  "LOCANALYSIS", "LOCALIZE"}
 end
 
 if ~exist('mode','var')
@@ -18,11 +18,11 @@ if rP.debugLog
 end
 
 if ~exist('inputPathDir','var') ||  (exist('inputPathDir', 'var') && isempty(inputPathDir))
-    inputPathDir  = 'C:\Users\mkulhandjian\OneDrive - Digital Global Systems\Desktop\codes\TDOA\Matlab\DGSTDOA\datasetSNR30\raw_data\gnb\QAM16';
-    %inputPathDir  = pwd;
+    %inputPathDir  = 'C:\Users\mkulhandjian\OneDrive - Digital Global Systems\Desktop\codes\TDOA\Matlab\DGSTDOA\datasetSNR30\raw_data\gnb\QAM16';
+    inputPathDir  = pwd;
 end
 if ~exist('outputPathDir','var') || (exist('outputPathDir', 'var') && isempty(outputPathDir))
-    outputPathDir  = 'C:\Users\michel.kulhandjian\Desktop\Projects\RadarProject\Code\Matlab\radarDetection\DrondeData\data\Oscar\Results2024';
+    %outputPathDir  = 'C:\Users\michel.kulhandjian\Desktop\Projects\RadarProject\Code\Matlab\radarDetection\DrondeData\data\Oscar\Results2024';
     outputPathDir = pwd;
 end
 
@@ -37,6 +37,15 @@ switch runType
         elapsed = fix(mod(time_s, [0 24*60^2, 60^2, 60])./[24*60^2, 60^2, 60, 1]);
         fprintf( 'Finished Generating Dataset %d days, %d hours, %d min, %d sec \n', elapsed(1), elapsed(2), elapsed(3), elapsed(4));
 
+    case "CROSSCORRELATE"
+        start = clock;
+        fprintf( 'Starting Cross Correlation Studies \n');
+        mode = 1;   % 0- load IQ from inputPath, 1- Generate Signal from Paramas.m
+        crossCorrolateStudies(inputPathDir, outputPathDir, mode, rP);
+        time_s = (clock - start)*[0 0 24*60^2 60.^[2 1 0]]';
+        elapsed = fix(mod(time_s, [0 24*60^2, 60^2, 60])./[24*60^2, 60^2, 60, 1]);
+        fprintf( 'Finished Cross Correlation Studies %d days, %d hours, %d min, %d sec \n', elapsed(1), elapsed(2), elapsed(3), elapsed(4));
+
     case "LOCANALYSIS"
          start = clock;
          fprintf( 'Starting localization analaysis \n');
@@ -49,7 +58,7 @@ switch runType
          start = clock;
          fprintf( 'Starting localization \n');
          % It analyzes Radar Detection via ROC plots.
-         mode = 1;
+         mode = 2;
          geolocate([], inputPathDir, outputPathDir, mode, rP);
          time_s = (clock - start)*[0 0 24*60^2 60.^[2 1 0]]';
          elapsed = fix(mod(time_s, [0 24*60^2, 60^2, 60])./[24*60^2, 60^2, 60, 1]);

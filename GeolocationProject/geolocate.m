@@ -122,6 +122,8 @@ fprintf(rP.fileID,' Starting Localizer... \n');
 
 [rP] = localize2 ( data, rP);
 
+fprintf('True position of Tx is: ['); fprintf(' %.02f ', rP.pPos); fprintf(']^T \n');
+
 save (rP.nameGeolocateRes, 'data', 'rP');
 fclose(rP.fileID);
 
