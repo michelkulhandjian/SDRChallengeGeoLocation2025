@@ -99,7 +99,7 @@ if strcmp(mod_type, 'QAM') || strcmp(mod_type, 'PAM')
         end
         fs = bw * os;
     else
-        os = fs / bw;
+        os = ceil(fs / bw);
     end
     packet_len = fs * (period * 1e6);
     symlen = floor(packet_len / os);

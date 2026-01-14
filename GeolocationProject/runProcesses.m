@@ -6,7 +6,7 @@ function runProcesses (inputPathDir, outputPathDir , runType, mode )
 rP.debugLog       = true;
 
 if ~exist('runType','var')
-    runType   = "LOCALIZE";   % Options: {"GENDATASET", "CROSSCORRELATE",  "LOCANALYSIS", "LOCALIZE"}
+    runType   = "CROSSCORRELATE";   % Options: {"GENDATASET", "CROSSCORRELATE",  "LOCANALYSIS", "LOCALIZE"}
 end
 
 if ~exist('mode','var')
@@ -20,6 +20,7 @@ end
 if ~exist('inputPathDir','var') ||  (exist('inputPathDir', 'var') && isempty(inputPathDir))
     %inputPathDir  = 'C:\Users\mkulhandjian\OneDrive - Digital Global Systems\Desktop\codes\TDOA\Matlab\DGSTDOA\datasetSNR30\raw_data\gnb\QAM16';
     inputPathDir  = pwd;
+    inputPathDir  = 'C:\Users\MichelKulhandjian\OneDrive - Digital Global Systems\Desktop\codes\OtherCodes\SDRChallenge-main\GeolocationProject\dataset';
 end
 if ~exist('outputPathDir','var') || (exist('outputPathDir', 'var') && isempty(outputPathDir))
     %outputPathDir  = 'C:\Users\michel.kulhandjian\Desktop\Projects\RadarProject\Code\Matlab\radarDetection\DrondeData\data\Oscar\Results2024';
@@ -40,7 +41,7 @@ switch runType
     case "CROSSCORRELATE"
         start = clock;
         fprintf( 'Starting Cross Correlation Studies \n');
-        mode = 1;   % 0- load IQ from inputPath, 1- Generate Signal from Paramas.m
+        mode = 0;   % 0- load IQ from inputPath, 1- Generate Signal from Paramas.m
         crossCorrolateStudies(inputPathDir, outputPathDir, mode, rP);
         time_s = (clock - start)*[0 0 24*60^2 60.^[2 1 0]]';
         elapsed = fix(mod(time_s, [0 24*60^2, 60^2, 60])./[24*60^2, 60^2, 60, 1]);
