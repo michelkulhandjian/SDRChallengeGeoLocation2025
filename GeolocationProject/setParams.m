@@ -170,6 +170,11 @@ rP.SNR               = SNR;
 rP.radioCh           = radioCh;  % Indeces of the rx radios
 rP.WAVEFORMS         = WAVEFORMS;
 
+%% USRP Hardware Impairment Parameters
+if exist('usrp','var')
+    rP.usrp              = usrp;
+end
+
 
 
 

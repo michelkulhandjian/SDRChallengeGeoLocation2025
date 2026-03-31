@@ -98,7 +98,41 @@ Ts              = 20e-3; %1e-4 ;%20e-3; % length of the radar stream in sec %  e
 SNR             = [30] ; %[-30, -25, -20, -15, -10, 0, 10, 15, 20, 25, 30];
 radioCh         = [1:84];  % Indeces of the rx radios
 WAVEFORMS       = {'BIN1-A', 'BIN1-B', 'BIN2-A', 'BIN2-B', 'BIN3-A', 'BIN3-B'};
-WAVEFORMS      = {'QAM16'}; % {'PSW', 'BPSK', 'QPSK', '8PSK', 'D8PSK', '16PSK', 'QAM16', 'QAM32', 'QAM64', 'QAM256', 'NXDN48', 'NXDN96', 'TONE', 'PAM2', 'PAM4', 'PAM8', 'PAM16'} 
+WAVEFORMS      = {'QAM16'}; % {'PSW', 'BPSK', 'QPSK', '8PSK', 'D8PSK', '16PSK', 'QAM16', 'QAM32', 'QAM64', 'QAM256', 'NXDN48', 'NXDN96', 'TONE', 'PAM2', 'PAM4', 'PAM8', 'PAM16'}
+
+%% USRP Hardware Impairment Parameters
+%  TX: NI USRP B210 (Analog Devices AD9361 transceiver)
+%  RX: NI USRP X310 (UBX-160 daughterboard + ADS62P48 ADC)
+usrp.enabled = true;  % Set to false to bypass all USRP impairments
+
+% --- B210 TX Impairments (AD9361 datasheet) ---
+usrp.tx.dacBits             = 12;      % AD9361 DAC resolution
+usrp.tx.iqGainImbalance_dB  = 0.05;    % After TX quad cal: ~-50 dB image
+usrp.tx.iqPhaseImbalance_deg = 0.3;    % After TX quad cal: ~-50 dB image
+usrp.tx.dcOffset_dBc        = -50;     % LO leakage after calibration at 0 dB atten
+usrp.tx.phaseNoiseRMS_deg   = 0.5;     % Integrated phase noise (~0.37 at 2.4G, ~0.59 at 5.5G)
+usrp.tx.enablePA            = true;    % Enable PA nonlinearity model
+usrp.tx.oip3_dBm            = 18;      % OIP3 (~19 dBm at 2.4G, ~17 at 5.5G, interpolated for 3.65G)
+usrp.tx.outputPower_dBm     = 7;       % Typical TX output power at 3.65 GHz
+usrp.tx.maxBW_MHz           = 56;      % Max analog bandwidth (AD9361)
+
+% --- X310 RX Impairments (UBX-160 + ADS62P48) ---
+usrp.rx.adcBits             = 14;      % ADS62P48 ADC resolution
+usrp.rx.iqGainImbalance_dB  = 0.03;    % UBX-160 RX imbalance (after cal)
+usrp.rx.iqPhaseImbalance_deg = 0.2;    % UBX-160 RX phase error
+usrp.rx.dcOffset_dBc        = -55;     % RX DC offset after calibration
+usrp.rx.phaseNoiseRMS_deg   = 0.4;     % X310 LO phase noise (TCXO reference)
+usrp.rx.noiseFigure_dB      = 3;       % UBX-160 noise figure at max gain
+usrp.rx.gain_dB             = 31.5;    % UBX-160 max RX gain
+
+% --- Asynchronous Receivers ---
+% When true, each X310 receiver has independent clock/LO (no shared 10 MHz/PPS).
+% When false, receivers are perfectly synchronized (shared reference).
+usrp.rx.asyncEnabled        = true;
+usrp.rx.clockOffset_ppm     = 2.5;    % Max sampling clock offset per RX (X310 TCXO: +/-2.5 ppm)
+usrp.rx.freqOffset_Hz       = 100;    % Max carrier frequency offset per RX (Hz)
+usrp.rx.maxTimeOffset_samples = 50;   % Max random start-time offset (samples) between receivers
+usrp.rx.randomPhaseOffset   = true;   % Each RX LO starts at random phase [0, 2*pi)
 
 
 

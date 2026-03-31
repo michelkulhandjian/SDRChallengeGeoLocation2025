@@ -131,8 +131,16 @@ txAntenna     = setupAntenna(txAntType, txArrayDim, fc, lambda, PLOT_TX_ANT);
 
 %% Set Up Transmitter
 % Set Up Radiator System Object Properties
-peakpower    = 10;   % 10 Watts
-txgain       = 10.0;    % Transmitter gain 36 dB (20)
+% When USRP mode is enabled, use B210-realistic parameters:
+%   B210 max TX output: ~+7 dBm at 3.65 GHz = 5 mW
+%   B210 TX gain range: 0 to 89.75 dB (attenuation control)
+if isfield(rP, 'usrp') && rP.usrp.enabled
+    peakpower = 10^(rP.usrp.tx.outputPower_dBm/10) * 1e-3;  % Convert dBm to Watts
+    txgain    = 0;  % Gain is modeled in the USRP impairment chain
+else
+    peakpower = 10;   % 10 Watts
+    txgain    = 10.0; % Transmitter gain 36 dB (20)
+end
 
 transmitter   = phased.Transmitter( 'PeakPower',peakpower, 'Gain',txgain, 'InUseOutputPort',true);
 %% Radiator
@@ -157,8 +165,16 @@ PLOT_RX_ANT   = false;
 rxAntenna     = setupAntenna(rxAntType, rxArrayDim, fc, lambda, PLOT_RX_ANT);
 
 %% Set Up Receiver
-rxgain       = 30.0;     % Receiver gain 42 dB (20)
-noisefig     = 5;      % Noise figure of receiver
+% When USRP mode is enabled, use X310 + UBX-160 realistic parameters:
+%   UBX-160 RX gain: 0 to 31.5 dB
+%   UBX-160 noise figure: ~3 dB at max gain
+if isfield(rP, 'usrp') && rP.usrp.enabled
+    rxgain   = rP.usrp.rx.gain_dB;          % UBX-160: 31.5 dB max
+    noisefig = rP.usrp.rx.noiseFigure_dB;   % UBX-160: ~3 dB
+else
+    rxgain   = 30.0;     % Receiver gain 42 dB (20)
+    noisefig = 5;        % Noise figure of receiver
+end
 
 %% Collector
 collector    = phased.Collector( 'Sensor', rxAntenna, 'OperatingFrequency', fc, 'Wavefront','Plane' ); %, 'Polarization', 'Combined');

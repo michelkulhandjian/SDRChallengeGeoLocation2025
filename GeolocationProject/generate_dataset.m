@@ -114,11 +114,21 @@ if bitand(mode , 128) % Localization
             % Generate the  waveform
             %[sig, Np, PRI, Ns]
             [sig, ~, ~, ~] = generateSig (curWaveF, fs, Ts, bw,  sigScaling, rP);
+
+            % Apply B210 TX impairments (DAC, IQ imbalance, DC offset, phase noise, PA)
+            sig = usrpImpairments(sig, fc, fs, rP, 'tx');
+
             [rxSig_] = transmit (sig, chanModel, fs, fc, rP, true); rxSig_ = squeeze(rxSig_);
             %pRMS = rms(rxSig_(:))^2;
             %rxSig_ = rxSig_/sqrt(pRMS)*10^((pdBm - 30)/20);
             numRx = size(rxSig_, 2 );
             for idxRx = 1:numRx
+                % Apply async receiver offsets (SCO, CFO, time/phase offset per RX)
+                rxSig_(:,idxRx) = usrpImpairments(rxSig_(:,idxRx), fc, fs, rP, 'rx_async', idxRx);
+
+                % Apply X310 RX impairments (IQ imbalance, DC offset, phase noise, ADC)
+                rxSig_(:,idxRx) = usrpImpairments(rxSig_(:,idxRx), fc, fs, rP, 'rx');
+
                 % Add AWGN noise accross all the received antennas
                 if rP.isAWGNChannel
                     [rxSigN, Noise] = addingAWGN (rxSig_(:,idxRx), curSNR);
@@ -204,9 +214,19 @@ elseif bitand(mode , 1)
             % Generate the  waveform
             %[sig, Np, PRI, Ns]
             [sig, ~, ~, ~] = generateSig (curWaveF, fs, Ts, bw, sigScaling, rP);
+
+            % Apply B210 TX impairments (DAC, IQ imbalance, DC offset, phase noise, PA)
+            sig = usrpImpairments(sig, fc, fs, rP, 'tx');
+
             [rxSig_] = transmit (sig, chanModel, fs, fc, rP, true);
             pRMS = rms(rxSig_(:))^2;
             rxSig_ = rxSig_/sqrt(pRMS)*10^((pdBm - 30)/20);
+
+            % Apply async receiver offsets + X310 RX impairments per receiver
+            for idxRxImp = 1:size(rxSig_, 2)
+                rxSig_(:,idxRxImp) = usrpImpairments(rxSig_(:,idxRxImp), fc, fs, rP, 'rx_async', idxRxImp);
+                rxSig_(:,idxRxImp) = usrpImpairments(rxSig_(:,idxRxImp), fc, fs, rP, 'rx');
+            end
 
             % Add AWGN noise accross all the received antennas
             [rxSigN, Noise] = addingAWGN (rxSig_, curSNR);
